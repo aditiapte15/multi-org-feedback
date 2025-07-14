@@ -1,15 +1,17 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const router = useRouter();
   const handleLogin = (e) => {
     e.preventDefault();
     console.log('Logging in:', { email, password });
     alert('Logged in successfully! (Mock login)');
+    router.push("/dashboard");
   };
 
   return (
