@@ -1,15 +1,17 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import  { useRouter } from 'next/navigation';
 export default function RegisterPage() {
   const [orgName, setOrgName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const router = useRouter();
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({ orgName, email, password }); // you can store this later
+    console.log({ orgName, email, password }); 
     alert('Registered successfully!');
+    router.push("/dashboard");
   };
 
   return (
