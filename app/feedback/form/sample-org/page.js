@@ -6,13 +6,26 @@ export default function SampleForm() {
     q1: '',
     q2: '',
     q3: '',
+    q4: '',
+    q5: [],
   });
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value, type, checked } = e.target;
+
+    if (type === 'checkbox') {
+      setFormData((prev) => {
+        const updated = checked
+          ? [...prev[name], value]
+          : prev[name].filter((v) => v !== value);
+        return { ...prev, [name]: updated };
+      });
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -40,6 +53,36 @@ export default function SampleForm() {
           Any other comments?
           <textarea name="q3" value={formData.q3} onChange={handleChange} className="w-full mt-2 p-2 border rounded text-black" />
         </label>
+
+        {/* Radio Button Example */}
+        <div className="mb-4 text-black">
+          <p className="mb-2">Would you attend another event like this?</p>
+          <label className="mr-4">
+            <input type="radio" name="q4" value="Yes" checked={formData.q4 === 'Yes'} onChange={handleChange} />
+            <span className="ml-2">Yes</span>
+          </label>
+          <label>
+            <input type="radio" name="q4" value="No" checked={formData.q4 === 'No'} onChange={handleChange} />
+            <span className="ml-2">No</span>
+          </label>
+        </div>
+
+        {/* Checkbox Example */}
+        <div className="mb-6 text-black">
+          <p className="mb-2">What did you like? (Select all that apply)</p>
+          <label className="block">
+            <input type="checkbox" name="q5" value="Speakers" onChange={handleChange} checked={formData.q5.includes('Speakers')} />
+            <span className="ml-2">Speakers</span>
+          </label>
+          <label className="block">
+            <input type="checkbox" name="q5" value="Venue" onChange={handleChange} checked={formData.q5.includes('Venue')} />
+            <span className="ml-2">Venue</span>
+          </label>
+          <label className="block">
+            <input type="checkbox" name="q5" value="Food" onChange={handleChange} checked={formData.q5.includes('Food')} />
+            <span className="ml-2">Food</span>
+          </label>
+        </div>
 
         <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
           Submit Feedback
