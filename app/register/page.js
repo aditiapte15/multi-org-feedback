@@ -1,17 +1,37 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import  { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+
 export default function RegisterPage() {
   const [orgName, setOrgName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ orgName, email, password }); 
-    alert('Registered successfully!');
-    router.push("/dashboard");
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orgName, email, password }),
+      });
+
+      if (res.ok) {
+        alert('Registered successfully!');
+        router.push(`/dashboard?orgName=${orgName}`);
+
+      } else {
+        alert('Registration failed. Try again.');
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      alert('Something went wrong.');
+    }
   };
 
   return (
@@ -49,10 +69,10 @@ export default function RegisterPage() {
         <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
           Register
         </button>
-      
+
         <p className='text-black text-center mt-4'>
-         Already have an account?{' '} 
-        <Link href ="/login" className='text-blue-600 hover:underline'>Sign In</Link>
+          Already have an account?{' '}
+          <Link href="/login" className='text-blue-600 hover:underline'>Sign In</Link>
         </p>
       </form>
     </div>
