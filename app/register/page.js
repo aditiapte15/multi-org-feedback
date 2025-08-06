@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
-  const [orgName, setOrgName] = useState('');
+  const [org, setOrg] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -18,15 +18,15 @@ export default function RegisterPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ orgName, email, password }),
+        body: JSON.stringify({ orgName: org, email, password }),
       });
 
       if (res.ok) {
         alert('Registered successfully!');
-        router.push(`/dashboard?orgName=${orgName}`);
-
+        router.push(`/dashboard?org=${org}`);
       } else {
-        alert('Registration failed. Try again.');
+        const data = await res.json();
+        alert(data.message || 'Registration failed. Try again.');
       }
     } catch (error) {
       console.error('Error during registration:', error);
@@ -42,9 +42,9 @@ export default function RegisterPage() {
         <input
           type="text"
           placeholder="Organization Name"
-          value={orgName}
-          onChange={(e) => setOrgName(e.target.value)}
-          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded text-black "
+          value={org}
+          onChange={(e) => setOrg(e.target.value)}
+          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded text-black"
           required
         />
 

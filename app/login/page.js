@@ -7,11 +7,31 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const handleLogin = (e) => {
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Logging in:', { email, password });
-    alert('Logged in successfully! (Mock login)');
-    router.push("/dashboard");
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Logged in successfully!");
+        router.push(`/dashboard?org=${data.orgName}`);
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (err) {
+      alert("Something went wrong. Please try again.");
+      console.error("Login error:", err);
+    }
   };
 
   return (
@@ -42,12 +62,11 @@ export default function LoginPage() {
         </button>
 
         <p className="text-black mt-4 text-center">
-        Don&apos;t have an account?{' '}
-        <Link href="/register" className="text-blue-600 hover:underline">
-        Sign Up
-        </Link>
+          Don&apos;t have an account?{' '}
+          <Link href="/register" className="text-blue-600 hover:underline">
+            Sign Up
+          </Link>
         </p>
-
       </form>
     </div>
   );

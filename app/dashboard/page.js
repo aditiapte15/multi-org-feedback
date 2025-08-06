@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
-  const org = searchParams.get('orgName') || 'Org';
+  const org = searchParams.get('org') || 'Org';
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-100 p-6">
