@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 
 export default function OrgFeedbackForm() {
   const [questions, setQuestions] = useState([]);
-  const [orgName, setOrgName] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const router = useRouter();
@@ -43,15 +42,26 @@ export default function OrgFeedbackForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const org = window.location.pathname.split('/').pop();
+    const org = window.location.pathname.split('/').pop(); 
     const payload = { title, description, questions };
 
-    await fetch(`/api/forms/${org}`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch(`/api/forms/${org}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload), // ✅ fixed
+      });
 
-    router.push(`/feedback/view/${org}`); // ✅ redirect after saving
+      if (res.ok) {
+        router.push(`/feedback/view/${org}`);
+      } else {
+        const err = await res.json();
+        alert("Error saving form: " + err.error);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Something went wrong!");
+    }
   };
 
   return (
@@ -61,15 +71,6 @@ export default function OrgFeedbackForm() {
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl mx-auto">
-        <input
-          type="text"
-          placeholder="Enter Organization Name"
-          value={orgName}
-          onChange={(e) => setOrgName(e.target.value)}
-          className="w-full px-4 py-2 border rounded text-black mb-4"
-          required
-        />
-
         <input
           type="text"
           placeholder="Form Title"

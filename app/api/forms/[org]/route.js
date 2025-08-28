@@ -1,26 +1,65 @@
-let formDatabase = {}; // In-memory store
+import connectDB from "@/lib/mongodb";
+import Org from "@/models/org";
+import { NextResponse } from "next/server";
 
-export async function GET(request, { params }) {
-  const { org } = params;
-  const form = formDatabase[org] || {
-    title: `Feedback Form for ${org}`,
-    description: 'We value your feedback!',
-    questions: ['How was your experience?', 'Suggestions?', 'Would you recommend us?']
-  };
+export async function POST(req, { params }) {
+  try {
+    await connectDB();
+    const body = await req.json();
+    const { org } = params;
 
-  return new Response(JSON.stringify(form), {
-    headers: { 'Content-Type': 'application/json' },
-  });
+    // ✅ Check org exists
+    const organization = await Org.findOne({ orgName: org });
+    if (!organization) {
+      return NextResponse.json(
+        { success: false, error: "Org not found" },
+        { status: 404 }
+      );
+    }
+
+    // ✅ Push new form into Org.forms
+    const { title, description, questions } = body;
+    const newForm = { title, description, questions };
+
+    organization.forms.push(newForm);
+    await organization.save();
+
+    return NextResponse.json(
+      { success: true, form: newForm },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error saving form:", error);
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
 }
 
-export async function POST(request, { params }) {
-  const { org } = params;
-  const body = await request.json();
+export async function GET(req, { params }) {
+  try {
+    await connectDB();
+    const { org } = params;
 
-  // Save to mock DB
-  formDatabase[org] = body;
+    // ✅ Find org
+    const organization = await Org.findOne({ orgName: org });
+    if (!organization) {
+      return NextResponse.json(
+        { success: false, error: "Org not found" },
+        { status: 404 }
+      );
+    }
 
-  return new Response(JSON.stringify({ success: true }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
+    // ✅ Return org forms
+    return NextResponse.json(
+      { success: true, forms: organization.forms },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
 }

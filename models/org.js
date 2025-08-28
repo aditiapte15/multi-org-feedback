@@ -1,9 +1,23 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const OrgSchema = new mongoose.Schema({
-  orgName: { type: String, required: true },
-  email: { type: String, required: true },
-  password: { type: String, required: true },
+const FormSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: String,
+  questions: [
+    {
+      label: String,
+      type: { type: String, enum: ["text", "radio", "checkbox"], default: "text" },
+      options: [String],
+      required: { type: Boolean, default: false },
+    },
+  ],
 });
 
-export default mongoose.models.Org || mongoose.model('Org', OrgSchema);
+const OrgSchema = new mongoose.Schema({
+  orgName: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  forms: [FormSchema], // ✅ keep forms inside Org
+});
+
+export default mongoose.models.Org || mongoose.model("Org", OrgSchema);
