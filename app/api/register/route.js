@@ -12,13 +12,28 @@ export async function POST(request) {
     // Save organization to DB
     const newOrg = await Organization.create({ orgName, email, password });
 
-    return NextResponse.json({
-      message: "Registered successfully",
-      org: newOrg,
-    }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Registered successfully",
+        org: newOrg,
+      },
+      { status: 200 }
+    );
 
   } catch (error) {
     console.error("Registration error:", error);
-    return NextResponse.json({ error: "Registration failed" }, { status: 500 });
+
+    let errorMessage = "Registration failed";
+    if (error.code === 11000) {
+      // ✅ Duplicate key error from MongoDB
+      if (error.keyPattern?.orgName) errorMessage = "Organization name already exists";
+      if (error.keyPattern?.email) errorMessage = "Email already exists";
+    }
+
+    return NextResponse.json(
+      { success: false, message: errorMessage },
+      { status: 400 }
+    );
   }
 }

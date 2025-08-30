@@ -1,11 +1,11 @@
-'use client';
-import Link from 'next/link';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
 
   const handleLogin = async (e) => {
@@ -14,19 +14,23 @@ export default function LoginPage() {
     try {
       const response = await fetch("/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json(); // ✅ safe parse
+      } catch {
+        alert("Invalid server response");
+        return;
+      }
 
       if (response.ok) {
         alert("Logged in successfully!");
-        router.push(`/dashboard?org=${data.orgName}`);
+        router.push(`/dashboard?org=${data.orgName}`); // ✅ keep your redirect
       } else {
-        alert(data.message || "Login failed");
+        alert(data.message || data.error || "Login failed");
       }
     } catch (err) {
       alert("Something went wrong. Please try again.");
@@ -36,7 +40,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-100 px-4">
-      <form onSubmit={handleLogin} className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+      <form
+        onSubmit={handleLogin}
+        className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"
+      >
         <h1 className="text-2xl font-bold text-blue-600 mb-6">Sign In</h1>
 
         <input
@@ -57,12 +64,15 @@ export default function LoginPage() {
           required
         />
 
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
           Sign In
         </button>
 
         <p className="text-black mt-4 text-center">
-          Don&apos;t have an account?{' '}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="text-blue-600 hover:underline">
             Sign Up
           </Link>
