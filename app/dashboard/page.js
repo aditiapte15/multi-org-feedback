@@ -1,16 +1,19 @@
 'use client';
+
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-
-export default function DashboardPage() {
+function DashboardContent() {
   const searchParams = useSearchParams();
   const org = searchParams.get('org') || 'Org';
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-100 p-6">
       <div className="bg-white p-8 rounded-lg shadow-md items-center justify-center">
-        <h1 className="text-3xl font-bold mb-6 text-blue-700 text-center">Welcome to your Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-6 text-blue-700 text-center">
+          Welcome to your Dashboard
+        </h1>
         <p className="mb-4 text-lg text-blue-800 text-center">Hello, Org {org}!</p>
         <div className="flex gap-4">
           <Link href={`/feedback/form/${org}`}>
@@ -31,5 +34,13 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div>Loading Dashboard...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
